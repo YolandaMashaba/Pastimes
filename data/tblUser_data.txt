@@ -1,0 +1,8 @@
+John|Doe|john.doe@example.com|johndoe|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0821234567|both|verified
+Jane|Smith|jane.smith@email.com|janesmith|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0832345678|buyer|verified
+Michael|Brown|michael.b@webmail.co.za|mikeb|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0843456789|seller|pending
+Sarah|Johnson|sarah.j@fashionmail.com|sarahj|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0824567890|both|verified
+David|Williams|david.w@clothingstore.co.za|davidw|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0835678901|buyer|verified
+Lisa|Anderson|lisa.a@thriftmail.com|lisaanderson|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0846789012|seller|verified
+Kevin|Martinez|kevin.m@usedclothes.com|kevinm|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0827890123|buyer|pending
+Amanda|Taylor|amanda.t@vintagefashion.com|amandat|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|0838901234|both|verified

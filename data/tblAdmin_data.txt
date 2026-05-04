@@ -1,0 +1,5 @@
+admin|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|admin@pastimes.com|System Administrator|super_admin
+moderator1|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|mod1@pastimes.com|Jane Moderator|moderator
+moderator2|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|mod2@pastimes.com|Mike Reviewer|moderator
+support_admin|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|support@pastimes.com|Support Team Lead|moderator
+head_admin|$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi|head@pastimes.com|Head Administrator|super_admin

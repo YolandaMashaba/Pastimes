@@ -1,0 +1,8 @@
+1|470.00|60.00|12 Main Street, Cape Town 8001|Credit Card|paid|delivered|ZA123456789
+1|350.00|60.00|12 Main Street, Cape Town 8001|EFT|paid|shipped|ZA987654321
+4|180.00|60.00|45 Oak Avenue, Johannesburg 2001|Credit Card|paid|confirmed|ZA456789123
+4|650.00|60.00|45 Oak Avenue, Johannesburg 2001|Credit Card|pending|pending|null
+2|300.00|60.00|78 Beach Road, Durban 4001|EFT|paid|delivered|ZA789123456
+3|220.00|60.00|22 Pine Street, Port Elizabeth 6001|Credit Card|paid|shipped|ZA321654987
+5|120.00|60.00|9 Rose Lane, Pretoria 0002|EFT|pending|pending|null
+1|250.00|60.00|12 Main Street, Cape Town 8001|Credit Card|paid|delivered|ZA147258369

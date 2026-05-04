@@ -1,0 +1,10 @@
+2|Vintage Levi's 501 Jeans|Classic 90s fit denim jeans, excellent condition|350.00|Pants|32|good|uploads/levis501.jpg|active
+2|Zara Cream Blazer|Elegant blazer for formal occasions|250.00|Jackets|M|like new|uploads/zara_blazer.jpg|active
+5|Nike Air Max Sneakers|Original Nike sneakers, worn twice|450.00|Shoes|42|like new|uploads/nike_airmax.jpg|active
+4|H&M Summer Dress|Floral print summer dress, size small|120.00|Dresses|S|good|uploads/hm_dress.jpg|active
+6|Cotton On Hoodie|Comfortable everyday hoodie|180.00|Tops|L|good|uploads/cottonon_hoodie.jpg|active
+7|Adidas Track Pants|Sporty track pants with stripes|220.00|Pants|M|new|uploads/adidas_pants.jpg|active
+3|Forever 21 Crop Top|Trendy crop top for casual wear|90.00|Tops|S|like new|uploads/f21_crop.jpg|active
+4|Woolworths Cardigan|Warm knitted cardigan|160.00|Jackets|M|good|uploads/woolworths_cardigan.jpg|flagged
+5|Converse High Tops|Classic black converse sneakers|300.00|Shoes|40|fair|uploads/converse.jpg|active
+6|Guess Leather Jacket|Genuine leather jacket, vintage style|650.00|Jackets|L|good|uploads/guess_jacket.jpg|active

@@ -1,0 +1,5 @@
+John Doe,john@gmail.com,password123,Seller
+Jane Smith,jane@gmail.com,password123,Seller
+Mike Brown,mike@gmail.com,password123,Admin
+Sarah Lee,sarah@gmail.com,password123,Seller
+David Jones,david@gmail.com,password123,Seller
