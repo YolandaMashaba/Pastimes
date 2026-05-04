@@ -15,3 +15,7 @@ Run:
 2. Start Apache & MySQL
 3. Open:
 http://localhost/pastimes-marketplace-v2
+
+Admin Credentials:
+- Username: admin
+- Password: admin12345
