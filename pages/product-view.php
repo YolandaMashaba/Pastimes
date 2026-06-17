@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_logged_in()) {
 <?php include '../includes/navbar.php'; ?>
 
 <div class="container">
-  <a href="gallery.php" style="display:inline-block;margin-bottom:1.5rem;color:var(--color-text-muted);text-decoration:none;font-size:.9rem;">
+  <a href="/pastimes-marketplace-v2/pages/gallery.php" style="display:inline-block;margin-bottom:1.5rem;color:var(--color-text-muted);text-decoration:none;font-size:.9rem;">
     ← Back to Gallery
   </a>
 
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_logged_in()) {
           <span class="warning-icon"></span>
           <div>
             <strong>Want to contact this seller?</strong>
-            <p><a href="login.php">Log in</a> or <a href="register.php">register</a> to send a message.</p>
+            <p><a href="/pastimes-marketplace-v2/pages/login.php">Log in</a> or <a href="/pastimes-marketplace-v2/pages/register.php">register</a> to send a message.</p>
           </div>
         </div>
       <?php else: ?>

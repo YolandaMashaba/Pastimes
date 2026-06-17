@@ -26,8 +26,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch();
 
         if ($admin && password_verify($password, $admin['password'])) {
+            // Fetch corresponding user_id from tbluser if exists
+            $user_id = null;
+            if (!empty($admin['user_id'])) {
+                $user_id = $admin['user_id'];
+            } else {
+                // Try to find user by username
+                $stmt = $pdo->prepare("SELECT user_id FROM tbluser WHERE username = ? LIMIT 1");
+                $stmt->execute([$admin['username']]);
+                $user_record = $stmt->fetch();
+                if ($user_record) {
+                    $user_id = $user_record['user_id'];
+                }
+            }
+
             $_SESSION['user'] = [
                 'id'                 => (int) $admin['admin_id'],
+                'user_id'            => $user_id, // Add user_id for messaging
+                'admin_id'           => (int) $admin['admin_id'],
                 'first_name'         => $admin['full_name'],
                 'last_name'          => '',
                 'name'               => $admin['full_name'],
@@ -85,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="auth-switch">
-      Not an admin? <a href="login.php">User Login</a>
+      Not an admin? <a href="/pastimes-marketplace-v2/pages/login.php">User Login</a>
     </div>
   </div>
 </div>

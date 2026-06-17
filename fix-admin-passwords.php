@@ -36,15 +36,18 @@ try {
 echo "<h2>Fix All Admin Passwords:</h2>";
 echo "<button onclick='fixAllPasswords()'>Fix All Plain Text Passwords</button>";
 
+echo "<script src='/pastimes-marketplace-v2/assets/js/custom-alert.js'></script>";
 echo "<script>
-function fixPassword(adminId) {
-    if (confirm('Fix password for admin ID ' + adminId + '?')) {
+async function fixPassword(adminId) {
+    const confirmed = await customConfirm('Fix password for admin ID ' + adminId + '?', 'Fix Password');
+    if (confirmed) {
         window.location.href = '?fix=' + adminId;
     }
 }
 
-function fixAllPasswords() {
-    if (confirm('Fix all plain text passwords?')) {
+async function fixAllPasswords() {
+    const confirmed = await customConfirm('Fix all plain text passwords?', 'Fix All Passwords');
+    if (confirmed) {
         window.location.href = '?fix=all';
     }
 }

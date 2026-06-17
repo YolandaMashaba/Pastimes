@@ -91,6 +91,68 @@ try {
         $stmt->execute(['head_admin', $passwordHash, 'head@pastimes.com', 'Head Administrator']);
     }
 
+    // ── tblverification_documents ───────────────────────────────
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS tblverification_documents (
+            document_id      INT AUTO_INCREMENT PRIMARY KEY,
+            user_id          INT NOT NULL,
+            document_type    ENUM('id_document','proof_of_address','bank_statement','business_registration','other') NOT NULL,
+            document_path    VARCHAR(255) NOT NULL,
+            document_name    VARCHAR(255) NOT NULL,
+            upload_date      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status           ENUM('pending','approved','rejected') DEFAULT 'pending',
+            reviewed_by      INT DEFAULT NULL,
+            reviewed_at      TIMESTAMP NULL DEFAULT NULL,
+            rejection_reason VARCHAR(255) DEFAULT NULL,
+            FOREIGN KEY (user_id) REFERENCES tbluser(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (reviewed_by) REFERENCES tbladmin(admin_id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    // ── tblmessages ─────────────────────────────────────────────
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS tblmessages (
+            message_id   INT AUTO_INCREMENT PRIMARY KEY,
+            sender_id    INT NOT NULL,
+            receiver_id  INT NOT NULL,
+            item_id      INT DEFAULT NULL,
+            message_text TEXT NOT NULL,
+            is_read      TINYINT(1) DEFAULT 0,
+            read_at      TIMESTAMP NULL DEFAULT NULL,
+            created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (sender_id) REFERENCES tbluser(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (receiver_id) REFERENCES tbluser(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (item_id) REFERENCES tblclothes(clothes_id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    // ── tblorder_items ──────────────────────────────────────────
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS tblorder_items (
+            order_item_id     INT AUTO_INCREMENT PRIMARY KEY,
+            order_id          INT NOT NULL,
+            clothes_id        INT NOT NULL,
+            quantity          INT DEFAULT 1,
+            price_at_purchase DECIMAL(10,2) NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES tblorder(order_id) ON DELETE CASCADE,
+            FOREIGN KEY (clothes_id) REFERENCES tblclothes(clothes_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    // ── tblcart ────────────────────────────────────────────────
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS tblcart (
+            cart_id    INT AUTO_INCREMENT PRIMARY KEY,
+            user_id    INT NOT NULL,
+            clothes_id INT NOT NULL,
+            quantity   INT DEFAULT 1,
+            added_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY unique_cart_item (user_id, clothes_id),
+            FOREIGN KEY (user_id) REFERENCES tbluser(user_id) ON DELETE CASCADE,
+            FOREIGN KEY (clothes_id) REFERENCES tblclothes(clothes_id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
     // ── Seed tbluser ──────────────────────────────────────────
     // Bcrypt hash of the string "password" (standard Laravel test hash)
     if ((int)$pdo->query("SELECT COUNT(*) FROM tbluser")->fetchColumn() === 0) {

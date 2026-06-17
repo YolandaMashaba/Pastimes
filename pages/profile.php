@@ -17,12 +17,31 @@ if (in_array($user['role'], ['seller', 'both'])) {
     $user_listings = $stmt->fetchAll();
 }
 
+// Fetch buyer orders
+$buyer_orders = [];
+if (in_array($user['role'], ['buyer', 'both'])) {
+    $stmt = $pdo->prepare("
+        SELECT o.*, 
+               COUNT(oi.order_item_id) as item_count
+        FROM tblorder o
+        LEFT JOIN tblorder_items oi ON o.order_id = oi.order_id
+        WHERE o.buyer_id = ?
+        GROUP BY o.order_id
+        ORDER BY o.order_date DESC
+    ");
+    $stmt->execute([$user['user_id']]);
+    $buyer_orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+}
+
 // Fetch user data with created_at field
-$stmt = $pdo->prepare("SELECT * FROM tbluser WHERE user_id = ?");
-$stmt->execute([$user['user_id']]);
-$user_data = $stmt->fetch();
-if ($user_data) {
-    $user = array_merge($user, $user_data);
+$user_id = $user['user_id'] ?? 0;
+if ($user_id > 0) {
+    $stmt = $pdo->prepare("SELECT * FROM tbluser WHERE user_id = ?");
+    $stmt->execute([$user_id]);
+    $user_data = $stmt->fetch();
+    if ($user_data) {
+        $user = array_merge($user, $user_data);
+    }
 }
 
 // Initialize variables
@@ -93,7 +112,7 @@ $user_id = $user['user_id'] ?? 0;
         </div>
         <div class="info-item">
           <label><i class="fas fa-phone"></i> Phone Number</label>
-          <p><?php echo htmlspecialchars($user['cellphone']); ?></p>
+          <p><?php echo htmlspecialchars($user['cellphone'] ?? 'Not provided'); ?></p>
         </div>
         <div class="info-item">
           <label><i class="fas fa-user-tag"></i> Account Type</label>
@@ -129,8 +148,7 @@ $user_id = $user['user_id'] ?? 0;
             
             <!-- Delete Button -->
             <div class="listing-actions">
-              <form method="POST" action="actions/delete-item.php" 
-                    onsubmit="return confirm('Are you sure you want to delete this item? This action cannot be undone.')">
+              <form method="POST" action="actions/delete-item.php" class="delete-item-form">
                 <input type="hidden" name="item_id" value="<?php echo $item['clothes_id']; ?>">
                 <button type="submit" class="btn btn-sm btn-danger">
                   <i class="fas fa-trash"></i> Delete
@@ -144,19 +162,58 @@ $user_id = $user['user_id'] ?? 0;
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($buyer_orders)): ?>
+    <div class="profile-section">
+      <h2>My Orders</h2>
+      <div class="orders-list">
+        <?php foreach ($buyer_orders as $order): ?>
+        <div class="order-card">
+          <div class="order-header">
+            <h4>Order #<?php echo (int)($order['order_id'] ?? 0); ?></h4>
+            <span class="badge badge-<?php echo htmlspecialchars($order['order_status'] ?? 'pending'); ?>">
+              <?php echo ucfirst(htmlspecialchars($order['order_status'] ?? 'pending')); ?>
+            </span>
+          </div>
+          <div class="order-details">
+            <p><strong>Date:</strong> <?php echo date('M j, Y', strtotime($order['order_date'] ?? 'now')); ?></p>
+            <p><strong>Total:</strong> R<?php echo number_format((float)($order['total_amount'] ?? 0), 2); ?></p>
+            <p><strong>Items:</strong> <?php echo (int)($order['item_count'] ?? 0); ?></p>
+            <?php if (!empty($order['tracking_number'])): ?>
+            <p><strong>Tracking:</strong> <?php echo htmlspecialchars($order['tracking_number']); ?></p>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    <?php endif; ?>
+
     <div class="profile-section">
       <h2>Account Actions</h2>
       <div class="action-buttons">
         <?php if (in_array($user['role'], ['seller', 'both'])): ?>
-          <a href="dashboard.php" class="btn btn-primary"><i class="fas fa-store"></i> Go to Seller Hub</a>
+          <a href="/pastimes-marketplace-v2/pages/dashboard.php" class="btn btn-primary"><i class="fas fa-store"></i> Go to Seller Hub</a>
         <?php endif; ?>
-        <a href="gallery.php" class="btn btn-outline"><i class="fas fa-images"></i> Browse Gallery</a>
-        <a href="logout.php" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="/pastimes-marketplace-v2/pages/gallery.php" class="btn btn-outline"><i class="fas fa-images"></i> Browse Gallery</a>
+        <a href="/pastimes-marketplace-v2/pages/logout.php" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
     </div>
   </div>
 
 </div>
+
+<script src="/pastimes-marketplace-v2/assets/js/custom-alert.js"></script>
+<script>
+document.querySelectorAll('.delete-item-form').forEach(form => {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const confirmed = await customConfirmDanger('Are you sure you want to delete this item? This action cannot be undone.', 'Delete Item');
+    if (confirmed) {
+      form.submit();
+    }
+  });
+});
+</script>
 
 </body>
 </html>

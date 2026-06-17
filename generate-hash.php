@@ -23,10 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password'])) {
     $verify = password_verify($password, $hash);
     echo "<p>Verification: " . ($verify ? "✓ Success" : "✗ Failed") . "</p>";
     
+    echo "<script src='/pastimes-marketplace-v2/assets/js/custom-alert.js'></script>";
     echo "<script>
     function copyHash() {
         navigator.clipboard.writeText(document.querySelector('input[type=\"text\"]').value);
-        alert('Hash copied to clipboard!');
+        customAlert('Hash copied to clipboard!', 'Success');
     }
     </script>";
 }

@@ -43,8 +43,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')"
             );
             $stmt->execute([$firstname, $lastname, $email, $username, $hash, $phone, $user_type]);
-            $success = true;
-            $sticky  = ['firstname' => '', 'lastname' => '', 'email' => '', 'username' => '', 'phone' => '', 'user_type' => 'buyer'];
+            $user_id = $pdo->lastInsertId();
+
+            // Handle document uploads for sellers/both
+            if (in_array($user_type, ['seller', 'both'])) {
+                $upload_dir = __DIR__ . '/../uploads/verification/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+
+                $required_docs = ['id_document', 'proof_of_address', 'bank_statement'];
+                $uploaded_count = 0;
+
+                foreach ($required_docs as $doc_type) {
+                    if (isset($_FILES[$doc_type]) && $_FILES[$doc_type]['error'] === UPLOAD_ERR_OK) {
+                        $file = $_FILES[$doc_type];
+
+                        // Validate file type
+                        $allowed_types = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                        $mime_type = finfo_file($finfo, $file['tmp_name']);
+                        finfo_close($finfo);
+
+                        if (!in_array($mime_type, $allowed_types)) {
+                            $error = "Invalid file type for $doc_type. Please upload PDF, JPG, or PNG files only.";
+                            break;
+                        }
+
+                        // Validate file size (5MB max)
+                        $max_size = 5 * 1024 * 1024;
+                        if ($file['size'] > $max_size) {
+                            $error = "File size exceeds 5MB limit for $doc_type.";
+                            break;
+                        }
+
+                        // Generate unique filename
+                        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                        $filename = 'doc_' . $user_id . '_' . $doc_type . '_' . time() . '_' . uniqid() . '.' . $extension;
+                        $filepath = $upload_dir . $filename;
+
+                        // Move uploaded file
+                        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+                            $stmt = $pdo->prepare("
+                                INSERT INTO tblverification_documents
+                                (user_id, document_type, document_path, document_name, status)
+                                VALUES (?, ?, ?, ?, 'pending')
+                            ");
+                            $stmt->execute([
+                                $user_id,
+                                $doc_type,
+                                'uploads/verification/' . $filename,
+                                $file['name']
+                            ]);
+                            $uploaded_count++;
+                        } else {
+                            $error = "Failed to upload $doc_type. Please try again.";
+                            break;
+                        }
+                    }
+                }
+
+                if ($uploaded_count < 3) {
+                    $error = 'Please upload all 3 required documents (ID Document, Proof of Address, Bank Statement).';
+                } else {
+                    $success = true;
+                    $sticky  = ['firstname' => '', 'lastname' => '', 'email' => '', 'username' => '', 'phone' => '', 'user_type' => 'buyer'];
+                }
+            } else {
+                $success = true;
+                $sticky  = ['firstname' => '', 'lastname' => '', 'email' => '', 'username' => '', 'phone' => '', 'user_type' => 'buyer'];
+            }
         }
     }
 }
@@ -76,11 +144,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       Your account is <strong>pending admin verification</strong>. You will be able to log in once an administrator approves your account. Thank you for registering!
     </div>
     <div class="auth-switch">
-      <a href="login.php" class="btn btn-outline" style="margin-top:.75rem;">Back to Login</a>
+      <a href="/pastimes-marketplace-v2/pages/login.php" class="btn btn-outline" style="margin-top:.75rem;">Back to Login</a>
     </div>
 
     <?php else: ?>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
       <div class="form-row">
         <div class="form-group">
           <label for="firstname">First Name <span class="field-required">*</span></label>
@@ -115,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="form-group">
         <label for="user_type">Account Type <span class="field-required">*</span></label>
-        <select id="user_type" name="user_type" required>
+        <select id="user_type" name="user_type" required onchange="toggleDocumentUpload()">
           <option value="buyer"  <?php echo $sticky['user_type'] === 'buyer'  ? 'selected' : ''; ?>>Buyer — I want to shop</option>
           <option value="seller" <?php echo $sticky['user_type'] === 'seller' ? 'selected' : ''; ?>>Seller — I want to sell</option>
           <option value="both"   <?php echo $sticky['user_type'] === 'both'   ? 'selected' : ''; ?>>Both — Buy &amp; Sell</option>
@@ -127,10 +195,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="password" id="password" name="password" required minlength="8" placeholder="••••••••">
       </div>
 
+      <!-- Document Upload Section for Sellers/Both -->
+      <div id="document-upload-section" style="display: <?php echo in_array($sticky['user_type'], ['seller', 'both']) ? 'block' : 'none'; ?>;">
+        <h3 style="margin: 1.5rem 0 1rem 0; font-size: 1.1rem; color: var(--color-dark);">Verification Documents (Required for Sellers)</h3>
+        <p style="margin-bottom: 1rem; color: var(--color-text-muted);">Please upload the following documents to verify your seller account:</p>
+
+        <div class="form-group">
+          <label for="id_document">ID Document (Passport/ID Card) <span class="field-required">*</span></label>
+          <input type="file" id="id_document" name="id_document" accept=".pdf,.jpg,.jpeg,.png" required>
+          <small class="form-hint">Accepted formats: PDF, JPG, PNG. Max file size: 5MB</small>
+        </div>
+
+        <div class="form-group">
+          <label for="proof_of_address">Proof of Address (Utility Bill/Bank Statement) <span class="field-required">*</span></label>
+          <input type="file" id="proof_of_address" name="proof_of_address" accept=".pdf,.jpg,.jpeg,.png" required>
+          <small class="form-hint">Accepted formats: PDF, JPG, PNG. Max file size: 5MB</small>
+        </div>
+
+        <div class="form-group">
+          <label for="bank_statement">Bank Statement <span class="field-required">*</span></label>
+          <input type="file" id="bank_statement" name="bank_statement" accept=".pdf,.jpg,.jpeg,.png" required>
+          <small class="form-hint">Accepted formats: PDF, JPG, PNG. Max file size: 5MB</small>
+        </div>
+      </div>
+
       <button class="btn btn-primary btn-block" type="submit">Create Account</button>
     </form>
 
-    <div class="auth-switch">Already have an account? <a href="login.php">Login</a></div>
+    <div class="auth-switch">Already have an account? <a href="/pastimes-marketplace-v2/pages/login.php">Login</a></div>
+
+    <script>
+    function toggleDocumentUpload() {
+      const userType = document.getElementById('user_type').value;
+      const docSection = document.getElementById('document-upload-section');
+      const docInputs = docSection.querySelectorAll('input[type="file"]');
+
+      if (userType === 'seller' || userType === 'both') {
+        docSection.style.display = 'block';
+        docInputs.forEach(input => input.required = true);
+      } else {
+        docSection.style.display = 'none';
+        docInputs.forEach(input => input.required = false);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', toggleDocumentUpload);
+    </script>
     <?php endif; ?>
   </div>
 </div>

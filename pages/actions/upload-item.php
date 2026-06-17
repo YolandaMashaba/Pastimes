@@ -9,10 +9,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+$user = current_user();
+
+// Check if seller is verified
+if (($user['verification_status'] ?? '') !== 'verified') {
+    set_flash('error', 'You need to be approved by the admin before you can sell items. Please request to sell first.');
+    header('Location: /pastimes-marketplace-v2/pages/dashboard.php?tab=seller');
+    exit;
+}
+
 $title       = trim($_POST['title']       ?? '');
 $description = trim($_POST['description'] ?? '');
 $price       = (float) ($_POST['price']   ?? 0);
-$user        = current_user();
 $seller_id   = (int) $user['user_id'];
 $image_path  = null;
 
